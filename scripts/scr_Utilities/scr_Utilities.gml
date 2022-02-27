@@ -1,3 +1,4 @@
+//Tester
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
 function scr_MakeBoard(num_Rows=10,num_Cols=10,spacer=10) {
