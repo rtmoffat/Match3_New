@@ -1,6 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
-show_debug_message("hi")
+show_debug_message("you pushed the selector left")
 curr_dot_inst=instance_place(x,y,obj_Dot)
 if curr_dot_inst {
 	if curr_dot_inst.selected {
