@@ -1,13 +1,25 @@
 //Tester
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
-function scr_MakeBoard(num_Rows=10,num_Cols=10,spacer=10) {
+/*function scr_MakeBoard(num_Rows=10,num_Cols=10,spacer=10) {
 	sh=sprite_get_height(spr_Square)
 	sw=sprite_get_width(spr_Square)
 	for (i=1;i<num_Rows;i++) {
 		for (j=1;j<num_Cols;j++) {
 			show_debug_message(string(spacer))
 			instance_create_depth((i*(sh+spacer)),(j*(sw+spacer)),1,obj_Square)
+		}
+	}
+}*/
+
+//Create board based on dots. No spacers
+function scr_MakeBoard_DOT(num_Rows=10,num_Cols=10,spacer=0) {
+	sh=sprite_get_height(spr_Dot)
+	sw=sprite_get_width(spr_Dot)
+	for (i=1;i<num_Rows;i++) {
+		for (j=1;j<num_Cols;j++) {
+			show_debug_message(string(spacer))
+			instance_create_depth((i*(sh+spacer)),(j*(sw+spacer)),1,obj_Dot)
 		}
 	}
 }
