@@ -12,14 +12,18 @@
 	}
 }*/
 
+function set_globals() {
+	global.sh=sprite_get_height(spr_Dot)
+	global.sw=sprite_get_width(spr_Dot)
+}
 //Create board based on dots. No spacers
 function scr_MakeBoard_DOT(num_Rows=10,num_Cols=10,spacer=0) {
-	sh=sprite_get_height(spr_Dot)
-	sw=sprite_get_width(spr_Dot)
+	/*sh=sprite_get_height(spr_Dot)
+	sw=sprite_get_width(spr_Dot)*/
 	for (i=1;i<num_Rows;i++) {
 		for (j=1;j<num_Cols;j++) {
 			show_debug_message(string(spacer))
-			instance_create_depth((i*(sh+spacer)),(j*(sw+spacer)),1,obj_Dot)
+			instance_create_depth((i*(global.sh+spacer)),(j*(global.sw+spacer)),1,obj_Dot)
 		}
 	}
 }
