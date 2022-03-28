@@ -1,5 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
+//x=x-64
 show_debug_message("you pushed the selector left")
 curr_dot_inst=instance_place(x,y,obj_Dot)
 neighbor_inst=instance_place(x-64,y,obj_Dot)
