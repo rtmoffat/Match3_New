@@ -139,3 +139,24 @@ function swap_Squares(i1,i2) {
 	//i1.image_index=2
 	//i2.image_index=2
 }
+
+function chk_Matches(my_x,my_y) {
+	//Check 2 up, 2 down, 2 left, 2 right for same color
+	//Up y-spr_Size & y-(spr_Size * 2)
+	//Down y+spr_Size & y+(spr_Size * 2)
+	//Left x-spr_Size & x-(spr_Size * 2)
+	//Right x+spr_Size & x+(spr_Size * 2)
+	my_inst=instance_place(my_x,my_y,obj_Dot)
+	if my_inst >=0 {
+		show_debug_message("Checking "+string(my_x) + ","+string(my_y) + "inst="+string(my_inst))
+		spr_Size=my_inst.sprite_width;
+		//Chk up
+		u_inst1=instance_place(my_x,my_y-spr_Size,obj_Dot)
+		if (u_inst1>=0) {
+			show_debug_message("Checking Match "+string(my_x) + ","+string(my_y-spr_Size))
+			if (my_inst.image_index == u_inst1.image_index) {
+				show_debug_message("The dot above the current dot is the same color "+string(my_inst)+"="+string(u_inst1))
+			}
+		}
+	}
+}
