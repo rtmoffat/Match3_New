@@ -56,75 +56,6 @@ function process_Selection(selected_instance) {
 	}
 }
 
-/*Check vertical and horizontal surroundings for other selected blocks.
-Return the instance of the first one we find*/
-function chk_Surroundings(selected_instance) {
-		
-		//Assuming width and height are equal
-		spr_Size=sprite_get_width(obj_Square)
-		//spr_Size=sprite_get_xoffset(obj_Square)
-		var coor_Struct=
-		{
-			top:
-				{
-					x:selected_instance.x,
-					y:selected_instance.y-(spr_Size+11),
-					inst:instance_place(selected_instance.x,selected_instance.y-(spr_Size+11),obj_Square)
-				},
-			left:
-				{
-					x:selected_instance.x-(spr_Size+11),
-					y:selected_instance.y,
-					inst:instance_place(selected_instance.x-(spr_Size+11),selected_instance.y,obj_Square)
-				},
-			right:
-				{
-					x:selected_instance.x+(spr_Size+11),
-					y:selected_instance.y,
-					inst:instance_place(selected_instance.x+(spr_Size+11),selected_instance.y,obj_Square)
-				},
-			bottom:
-				{
-					x:selected_instance.x,
-					y:selected_instance.y+(spr_Size+11),
-					inst:instance_place(selected_instance.x,selected_instance.y+(spr_Size+11),obj_Square)
-				}
-		}
-		show_debug_message("Top Instance="+string(coor_Struct.top.inst))
-		show_debug_message("Left Instance="+string(coor_Struct.left.inst))
-		show_debug_message("Right Instance="+string(coor_Struct.right.inst))
-		show_debug_message("Bottom Instance="+string(coor_Struct.bottom.inst))
-		struct_Arr=variable_struct_get_names(coor_Struct)
-		
-		/*tester="top"
-		show_debug_message("Mystruct topx="+string(coor_Struct.top.x))
-		tester2=variable_struct_get(coor_Struct,tester)
-		show_debug_message("mygotstruct="+string(tester2.x)+typeof(tester2))*/
-		
-		//Loop through the struct
-		
-		for (i=0;i<array_length(struct_Arr);i++) {
-			myStructVar=variable_struct_get(coor_Struct,struct_Arr[i])
-			show_debug_message("myStructVarIndex="+struct_Arr[i]+":"+string(myStructVar.x)+","+string(myStructVar.y))
-			//Check adjacent square
-			//adj_instance=instance_place(myStructVar.x,myStructVar.y,obj_Square)
-			adj_instance=myStructVar.inst
-			if adj_instance>=0 {
-				if adj_instance.selected {
-					show_debug_message(string(adj_instance)+" is next to "+string(selected_instance))
-					return adj_instance
-				}
-			}
-		}
-		
-/*		adj_instance=instance_place(selected_instance.x+spr_Size,selected_instance.y,obj_Square)
-		if adj_instance>=0 {
-			if adj_instance.selected {
-				show_debug_message(string(adj_instance)+" is next to "+string(selected_instance))
-				return adj_instance
-			}
-		}*/
-}
 
 function swap_Squares(i1,i2) {
 	show_debug_message("Swapping "+string(i1)+" with "+string(i2))
@@ -146,17 +77,50 @@ function chk_Matches(my_x,my_y) {
 	//Down y+spr_Size & y+(spr_Size * 2)
 	//Left x-spr_Size & x-(spr_Size * 2)
 	//Right x+spr_Size & x+(spr_Size * 2)
-	my_inst=instance_place(my_x,my_y,obj_Dot)
-	if my_inst >=0 {
-		show_debug_message("Checking "+string(my_x) + ","+string(my_y) + "inst="+string(my_inst))
-		spr_Size=my_inst.sprite_width;
-		//Chk up
-		u_inst1=instance_place(my_x,my_y-spr_Size,obj_Dot)
-		if (u_inst1>=0) {
-			show_debug_message("Checking Match "+string(my_x) + ","+string(my_y-spr_Size))
-			if (my_inst.image_index == u_inst1.image_index) {
-				show_debug_message("The dot above the current dot is the same color "+string(my_inst)+"="+string(u_inst1))
+	my_dirs=
+		{
+			d_left:function(inst,dist=1) {
+				coors={
+					cx:inst.x-(inst.sprite_width*dist),
+					cy:inst.y
+				}
+				return coors
+			},
+			d_right:function(inst,dist=1) {
+				coors={
+					cx:inst.x+(inst.sprite_width*dist),
+					cy:inst.y
+				}
+				return coors
+			},
+			d_up:function(inst,dist=1) {
+				coors={
+					cx:inst.x,
+					cy:inst.y-(inst.sprite_width*dist)
+				}
+				return coors
+			},
+			d_down:function(inst,dist=1) {
+				coors={
+					cx:inst.x,
+					cy:inst.y+(inst.sprite_width*dist)
+				}
+				return coors
 			}
 		}
+	
+	//Check if we're on a dot
+	my_inst=instance_place(my_x,my_y,obj_Dot)
+	if my_inst>=0 {
+			s_names=variable_struct_get_names(my_dirs)
+			//Loop through all directions in struct
+			for (n=0;n<array_length(s_names);n++) {
+				//Check all directions
+				my_coors=my_dirs [$ s_names[n]](my_inst,1)
+				t_inst=instance_place(my_coors.cx,my_coors.cy,obj_Dot)
+				if (t_inst>=0) and (my_inst.image_index==t_inst.image_index) {
+						show_debug_message("Match")
+				}
+			}
 	}
 }
