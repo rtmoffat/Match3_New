@@ -15,6 +15,38 @@
 function set_globals() {
 	global.sh=sprite_get_height(spr_Dot)
 	global.sw=sprite_get_width(spr_Dot)
+	
+	global.my_dirs=
+		{
+			d_left:function(inst,dist=1) {
+				coors={
+					cx:inst.x-(inst.sprite_width*dist),
+					cy:inst.y
+				}
+				return coors
+			},
+			d_right:function(inst,dist=1) {
+				coors={
+					cx:inst.x+(inst.sprite_width*dist),
+					cy:inst.y
+				}
+				return coors
+			},
+			d_up:function(inst,dist=1) {
+				coors={
+					cx:inst.x,
+					cy:inst.y-(inst.sprite_height*dist)
+				}
+				return coors
+			},
+			d_down:function(inst,dist=1) {
+				coors={
+					cx:inst.x,
+					cy:inst.y+(inst.sprite_height*dist)
+				}
+				return coors
+			}
+		}
 }
 //Create board based on dots. No spacers
 function scr_MakeBoard_DOT(num_Rows=10,num_Cols=10,spacer=0) {
@@ -24,6 +56,11 @@ function scr_MakeBoard_DOT(num_Rows=10,num_Cols=10,spacer=0) {
 		for (j=1;j<num_Cols;j++) {
 			show_debug_message(string(spacer))
 			instance_create_depth((i*(global.sh+spacer)),(j*(global.sw+spacer)),1,obj_Dot)
+			while (chk_Matches(x,y,,,image_index))
+			{
+				show_debug_message("changing color");
+				image_index=floor(random_range(0,6));
+			}
 		}
 	}
 }
@@ -71,56 +108,42 @@ function swap_Squares(i1,i2) {
 	//i2.image_index=2
 }
 
-function chk_Matches(my_x,my_y) {
-	//Check 2 up, 2 down, 2 left, 2 right for same color
-	//Up y-spr_Size & y-(spr_Size * 2)
-	//Down y+spr_Size & y+(spr_Size * 2)
-	//Left x-spr_Size & x-(spr_Size * 2)
-	//Right x+spr_Size & x+(spr_Size * 2)
-	my_dirs=
-		{
-			d_left:function(inst,dist=1) {
-				coors={
-					cx:inst.x-(inst.sprite_width*dist),
-					cy:inst.y
-				}
-				return coors
-			},
-			d_right:function(inst,dist=1) {
-				coors={
-					cx:inst.x+(inst.sprite_width*dist),
-					cy:inst.y
-				}
-				return coors
-			},
-			d_up:function(inst,dist=1) {
-				coors={
-					cx:inst.x,
-					cy:inst.y-(inst.sprite_width*dist)
-				}
-				return coors
-			},
-			d_down:function(inst,dist=1) {
-				coors={
-					cx:inst.x,
-					cy:inst.y+(inst.sprite_width*dist)
-				}
-				return coors
-			}
-		}
-	
+//Check for a match for a given x,y coordinate, distance from coordinate, and given direction
+// If this is the initial creation for the instance, set init_c to the color index of the image to check
+function chk_Matches(my_x,my_y,my_dist=1,my_dir="all",init_c=-1) {
+	matched=-1; //assume no match
+	show_debug_message("checking "+string(my_dist))
+	s_names=variable_struct_get_names(global.my_dirs)
 	//Check if we're on a dot
 	my_inst=instance_place(my_x,my_y,obj_Dot)
-	if my_inst>=0 {
-			s_names=variable_struct_get_names(my_dirs)
+	if (init_c) {
+			//this is the initial creation of the instance, which doesn't exist yet,
+			// but we still have to check things around it.
+			my_inst={}
+			my_inst.image_index=init_c;
+		}
+	if my_inst>=0 or init_c {
 			//Loop through all directions in struct
+			//n=index of direction name
 			for (n=0;n<array_length(s_names);n++) {
-				//Check all directions
-				my_coors=my_dirs [$ s_names[n]](my_inst,1)
+				if (s_names[n]=="coors") continue;
+				if (my_dir != "all") and (s_names[n] != my_dir) continue;
+				//Check each direction for matches with my_inst
+				my_coors=global.my_dirs[$ s_names[n]](my_inst,my_dist)
 				t_inst=instance_place(my_coors.cx,my_coors.cy,obj_Dot)
+				//If t_inst contains a dot and its image_index is the same as my_inst's index, we have a double match
+				// and need to continue to check for additional matches for the matched dot 
+				// until we do not get a match
 				if (t_inst>=0) and (my_inst.image_index==t_inst.image_index) {
-						show_debug_message("Match")
+						show_debug_message("Matched "+s_names[n]+" "+string(my_dist)+ " spaces away.");
+						matched=1;
+						if (init_c) break;
+						tmp=chk_Matches(t_inst.x,t_inst.y,my_dist+1,s_names[n]);
 				}
 			}
 	}
+	return matched;
+}
+
+function highlight_Matches(c_instance) {
 }
